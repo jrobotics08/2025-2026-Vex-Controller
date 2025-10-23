@@ -93,7 +93,7 @@ motor motors[4] = {leftMotorA, leftMotorB, rightMotorA, rightMotorB};
 
 void SetV(int speed)
 {
-  Brain.Screen.print("velocity is SET zaddy");
+  
 
   for(int squirtyLilRepeater = 0; squirtyLilRepeater < 4; squirtyLilRepeater++)
   {
@@ -141,12 +141,12 @@ axis1Pos = Controller1.Axis1.position();
 
 void Drive()
 {  
-  
+
   if(axis1Pos > 0)
   {
     SetV(axis1Pos);
     //sets velocity for all motors
-    Brain.Screen.print("turning");
+ 
     for(int i = 0; i < 2; i++)
     {
       motors[i].spin(forward);
@@ -160,7 +160,7 @@ void Drive()
   }
   //right turn
 
-  if(axis1Pos < 0)
+  else if(axis1Pos < 0)
   {
     SetV(axis1Pos);
     leftMotorA.spin(forward);
