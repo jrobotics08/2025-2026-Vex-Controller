@@ -1,0 +1,210 @@
+#pragma region VEXcode Generated Robot Configuration
+// Make sure all required headers are included.
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
+#include <string.h>
+
+
+#include "vex.h"
+
+using namespace vex;
+
+// Brain should be defined by default
+brain Brain;
+
+
+// START V5 MACROS
+#define waitUntil(condition)                                                   \
+  do {                                                                         \
+    wait(5, msec);                                                             \
+  } while (!(condition))
+
+#define repeat(iterations)                                                     \
+  for (int iterator = 0; iterator < iterations; iterator++)
+// END V5 MACROS
+
+
+// Robot configuration code.
+motor leftMotorA = motor(PORT1, ratio18_1, false);
+motor leftMotorB = motor(PORT3, ratio18_1, false);
+motor_group LeftDriveSmart = motor_group(leftMotorA, leftMotorB);
+motor rightMotorA = motor(PORT2, ratio18_1, true);
+motor rightMotorB = motor(PORT4, ratio18_1, true);
+motor_group RightDriveSmart = motor_group(rightMotorA, rightMotorB);
+drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 319.19, 295, 40, mm, 1);
+
+controller Controller1 = controller(primary);
+
+
+// generating and setting random seed
+void initializeRandomSeed(){
+  int systemTime = Brain.Timer.systemHighResolution();
+  double batteryCurrent = Brain.Battery.current();
+  double batteryVoltage = Brain.Battery.voltage(voltageUnits::mV);
+
+  // Combine these values into a single integer
+  int seed = int(batteryVoltage + batteryCurrent * 100) + systemTime;
+
+  // Set the seed
+  srand(seed);
+}
+
+
+
+void vexcodeInit() {
+
+  //Initializing random seed.
+  initializeRandomSeed(); 
+}
+
+
+// Helper to make playing sounds from the V5 in VEXcode easier and
+// keeps the code cleaner by making it clear what is happening.
+void playVexcodeSound(const char *soundName) {
+  printf("VEXPlaySound:%s\n", soundName);
+  wait(5, msec);
+}
+
+
+
+// define variable for remote controller enable/disable
+bool RemoteControlCodeEnabled = true;
+
+#pragma endregion VEXcode Generated Robot Configuration
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       {author}                                                  */
+/*    Created:      {date}                                                    */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+
+// Include the V5 Library
+#include "vex.h"
+  
+// Allows for easier use of the VEX Library
+using namespace vex;
+motor motors[4] = {leftMotorA, leftMotorB, rightMotorA, rightMotorB};
+
+
+void SetV(int speed)
+{
+  Brain.Screen.print("velocity is SET zaddy");
+
+  for(int squirtyLilRepeater = 0; squirtyLilRepeater < 4; squirtyLilRepeater++)
+  {
+    motors[squirtyLilRepeater].setVelocity(speed,percent);
+  }
+}
+//iterates over each motor and sets velcocity to int speed
+
+class Dtrain
+{
+
+public:
+
+int axis3Pos;
+int axis4Pos;
+int axis1Pos;
+
+
+void OhShitStopTheBot()
+{
+  leftMotorA.stop();
+  leftMotorB.stop();
+  rightMotorA.stop();
+  rightMotorB.stop();
+}
+//pretty self explanatory
+
+Dtrain(int torqueConfig)
+{
+  leftMotorA.setMaxTorque(torqueConfig,percent);
+  leftMotorB.setMaxTorque(torqueConfig,percent);
+
+  rightMotorA.setMaxTorque(torqueConfig,percent);
+  rightMotorB.setMaxTorque(torqueConfig,percent);
+}
+//drivetrain object constructor
+
+void GetAxisPos()
+{
+axis3Pos = Controller1.Axis3.position();
+axis4Pos = Controller1.Axis4.position();
+axis1Pos = Controller1.Axis1.position();
+}
+//read axis positions
+
+void Drive()
+{  
+  
+  if(axis1Pos > 0)
+  {
+    SetV(axis1Pos);
+    //sets velocity for all motors
+    Brain.Screen.print("turning");
+    for(int i = 0; i < 2; i++)
+    {
+      motors[i].spin(forward);
+    }
+
+    for (int i = 2; i < 4; i++) 
+    {
+      motors[i].spin(reverse);
+    }
+
+  }
+  //right turn
+
+  if(axis1Pos < 0)
+  {
+    SetV(axis1Pos);
+    leftMotorA.spin(forward);
+    leftMotorB.spin(forward);
+    rightMotorA.spin(reverse);
+    rightMotorB.spin(reverse);
+  }
+  //left turn
+  else 
+  {
+    leftMotorA.setVelocity(axis3Pos,percent);
+    leftMotorB.setVelocity(axis3Pos,percent);
+    rightMotorA.setVelocity(axis3Pos,percent);
+    rightMotorB.setVelocity(axis3Pos,percent);
+
+    leftMotorA.spin(forward);
+    leftMotorB.spin(forward);
+    rightMotorA.spin(forward);
+    rightMotorB.spin(forward);
+  }
+}
+
+};
+int main() {
+  // Initializing Robot Configuration. DO NOT REMOVE!
+  vexcodeInit();
+  Dtrain dtrain(100);
+  // Begin project code
+  while(true)
+  {
+    
+    dtrain.GetAxisPos();
+
+
+    if(dtrain.axis3Pos == 0 && dtrain.axis4Pos == 0 && dtrain.axis1Pos == 0)
+    {
+      dtrain.OhShitStopTheBot();
+      SetV(0);
+    }
+    else
+    {
+      dtrain.Drive();
+    }
+  
+  wait(20,msec);
+  }
+}
