@@ -27,11 +27,11 @@ brain Brain;
 
 
 // Robot configuration code.
-motor leftMotorA = motor(PORT1, ratio18_1, false);
-motor leftMotorB = motor(PORT3, ratio18_1, false);
+motor leftMotorA = motor(PORT3, ratio18_1, false);
+motor leftMotorB = motor(PORT5, ratio18_1, false);
 motor_group LeftDriveSmart = motor_group(leftMotorA, leftMotorB);
-motor rightMotorA = motor(PORT2, ratio18_1, true);
-motor rightMotorB = motor(PORT4, ratio18_1, true);
+motor rightMotorA = motor(PORT4, ratio18_1, true);
+motor rightMotorB = motor(PORT6, ratio18_1, true);
 motor_group RightDriveSmart = motor_group(rightMotorA, rightMotorB);
 drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 319.19, 295, 40, mm, 1);
 
@@ -107,13 +107,14 @@ class Dtrain
 
 public:
 
-int axis3Pos;
-int axis4Pos;
-int axis1Pos;
+int axis3Pos = 0;
+int axis4Pos = 0;
+int axis1Pos = 0;
 
 
 void OhShitStopTheBot()
 {
+  SetV(0);
   leftMotorA.stop();
   leftMotorB.stop();
   rightMotorA.stop();
@@ -163,24 +164,22 @@ void Drive()
   else if(axis1Pos < 0)
   {
     SetV(axis1Pos);
-    leftMotorA.spin(forward);
-    leftMotorB.spin(forward);
-    rightMotorA.spin(reverse);
-    rightMotorB.spin(reverse);
+    leftMotorA.spin(reverse);
+    leftMotorB.spin(reverse);
+    rightMotorA.spin(forward);
+    rightMotorB.spin(forward);
   }
   //left turn
   else 
   {
-    leftMotorA.setVelocity(axis3Pos,percent);
-    leftMotorB.setVelocity(axis3Pos,percent);
-    rightMotorA.setVelocity(axis3Pos,percent);
-    rightMotorB.setVelocity(axis3Pos,percent);
+    SetV(axis3Pos);
 
     leftMotorA.spin(forward);
     leftMotorB.spin(forward);
     rightMotorA.spin(forward);
     rightMotorB.spin(forward);
   }
+  //straight
 }
 
 };
@@ -198,10 +197,9 @@ int main() {
     if(dtrain.axis3Pos == 0 && dtrain.axis4Pos == 0 && dtrain.axis1Pos == 0)
     {
       dtrain.OhShitStopTheBot();
-      SetV(0);
     }
     else
-    {
+    { 
       dtrain.Drive();
     }
   
