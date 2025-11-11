@@ -88,121 +88,106 @@ bool RemoteControlCodeEnabled = true;
   
 // Allows for easier use of the VEX Library
 using namespace vex;
+int axis3Pos;
+int axis1Pos; 
+int axis4Pos;
 motor motors[4] = {leftMotorA, leftMotorB, rightMotorA, rightMotorB};
 
-
-void SetV(int speed)
+void Drive(int speed, int dir[4])
 {
-  
-
-  for(int squirtyLilRepeater = 0; squirtyLilRepeater < 4; squirtyLilRepeater++)
+  int fixedSpeed = abs(speed);
+  for(int i = 0; i < 4; i++)
   {
-    motors[squirtyLilRepeater].setVelocity(speed,percent);
-  }
-}
-//iterates over each motor and sets velcocity to int speed
+    motors[i].setVelocity(fixedSpeed,percent);
 
-class Dtrain
-{
-
-public:
-
-int axis3Pos = 0;
-int axis4Pos = 0;
-int axis1Pos = 0;
-
-
-void OhShitStopTheBot()
-{
-  SetV(0);
-  leftMotorA.stop();
-  leftMotorB.stop();
-  rightMotorA.stop();
-  rightMotorB.stop();
-}
-//pretty self explanatory
-
-Dtrain(int torqueConfig)
-{
-  leftMotorA.setMaxTorque(torqueConfig,percent);
-  leftMotorB.setMaxTorque(torqueConfig,percent);
-
-  rightMotorA.setMaxTorque(torqueConfig,percent);
-  rightMotorB.setMaxTorque(torqueConfig,percent);
-}
-//drivetrain object constructor
-
-void GetAxisPos()
-{
-axis3Pos = Controller1.Axis3.position();
-axis4Pos = Controller1.Axis4.position();
-axis1Pos = Controller1.Axis1.position();
-}
-//read axis positions
-
-void Drive()
-{  
-
-  if(axis1Pos > 0)
-  {
-    SetV(axis1Pos);
-    //sets velocity for all motors
- 
-    for(int i = 0; i < 2; i++)
+    switch(dir[i])
     {
+      case 0:
       motors[i].spin(forward);
-    }
+      break;
 
-    for (int i = 2; i < 4; i++) 
-    {
+      case 1:
       motors[i].spin(reverse);
+      break;
+
+      default:
+      //shit broke, too high a num
+      break;
     }
-
   }
-  //right turn
 
-  else if(axis1Pos < 0)
-  {
-    SetV(axis1Pos);
-    leftMotorA.spin(reverse);
-    leftMotorB.spin(reverse);
-    rightMotorA.spin(forward);
-    rightMotorB.spin(forward);
-  }
-  //left turn
-  else 
-  {
-    SetV(axis3Pos);
-
-    leftMotorA.spin(forward);
-    leftMotorB.spin(forward);
-    rightMotorA.spin(forward);
-    rightMotorB.spin(forward);
-  }
-  //straight
 }
+//just sets velocity of shit bcs im sick of doing it manually
 
-};
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  Dtrain dtrain(100);
   // Begin project code
-  while(true)
-  {
-    
-    dtrain.GetAxisPos();
+  leftMotorA.setMaxTorque(100,percent);
+  leftMotorB.setMaxTorque(100,percent);
+  rightMotorA.setMaxTorque(100,percent);
+  rightMotorB.setMaxTorque(100,percent);
 
 
-    if(dtrain.axis3Pos == 0 && dtrain.axis4Pos == 0 && dtrain.axis1Pos == 0)
+  while (true) {
+    axis3Pos = Controller1.Axis3.position();
+    axis1Pos = Controller1.Axis1.position();
+    axis4Pos = Controller1.Axis4.position();
+
+    if(axis3Pos == 0 && axis1Pos == 0 && axis4Pos == 0)
     {
-      dtrain.OhShitStopTheBot();
+      leftMotorA.stop();
+      leftMotorB.stop();
+      rightMotorA.stop();
+      rightMotorB.stop();
+
+      leftMotorA.setVelocity(0,percent);
+      leftMotorB.setVelocity(0,percent);
+      rightMotorA.setVelocity(0,percent);
+      rightMotorB.setVelocity(0,percent);
     }
-    else
-    { 
-      dtrain.Drive();
+    //no input so bot is stopped
+
+    else 
+    {
+      if(axis3Pos > 0)
+      {
+       Drive(axis3Pos, (int[4]){0,0,0,0});
+      }
+      //drive straight forward
+      if(axis3Pos < 0)
+      {
+        Drive(axis3Pos, (int[4]){1,1,1,1});
+      }
+      //drive straight backward
+
+      if(axis1Pos > 0)
+      {
+      Drive(axis1Pos, (int[4]){0,0,1,1});
+      }
+      //right turn
+
+      if(axis1Pos < 0)
+      {
+        Drive(axis1Pos, (int[4]){1,1,0,0});
+      }
+      //left turn
+
+      if(axis4Pos > 0)
+      {
+        Drive(axis4Pos, (int[4]){0,1,0,1});
+      }
+      //strafe right
+
+      if(axis4Pos < 0)
+      {
+        Drive(axis4Pos,(int[4]){1,0,1,0});
+      }
+      //strafe left
     }
-  
-  wait(20,msec);
+
+
+    wait(20,msec);
   }
+  
 }
