@@ -27,11 +27,11 @@ brain Brain;
 
 
 // Robot configuration code.
-motor leftMotorA = motor(PORT3, ratio18_1, false);
-motor leftMotorB = motor(PORT5, ratio18_1, false);
+motor leftMotorA = motor(PORT5, ratio18_1, false);
+motor leftMotorB = motor(PORT7, ratio18_1, false);
 motor_group LeftDriveSmart = motor_group(leftMotorA, leftMotorB);
-motor rightMotorA = motor(PORT4, ratio18_1, true);
-motor rightMotorB = motor(PORT6, ratio18_1, true);
+motor rightMotorA = motor(PORT6, ratio18_1, true);
+motor rightMotorB = motor(PORT8, ratio18_1, true);
 motor_group RightDriveSmart = motor_group(rightMotorA, rightMotorB);
 drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 319.19, 295, 40, mm, 1);
 
@@ -175,13 +175,13 @@ int main() {
 
       if(axis4Pos > 0)
       {
-        Drive(axis4Pos, (int[4]){0,1,0,1});
+        Drive(axis4Pos, (int[4]){0,1,1,0});
       }
       //strafe right
 
       if(axis4Pos < 0)
       {
-        Drive(axis4Pos,(int[4]){1,0,1,0});
+        Drive(axis4Pos,(int[4]){1,0,0,1});
       }
       //strafe left
     }
